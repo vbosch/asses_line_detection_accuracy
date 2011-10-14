@@ -3,5 +3,32 @@
 require File.expand_path(
     File.join(File.dirname(__FILE__), %w[.. lib asses_line_detection_accuracy]))
 
-# Put your code here
+require 'trollop'
+require 'ap'
+
+opts = Trollop::options do
+	version "asses_line_dectection_accuracy 0.0.1 (c) 2011 Vicente Bosch Campos"
+	banner <<-EOS
+asses_line_dectection_accuracy is a command tool to review the accuracy of the detected lines against the orinal line
+label file by means of the edit distance.
+Usage:
+	asses_line_dectection_accuracy [options]
+	where [options] are:
+EOS
+
+opt :test_list_file, "file containing the list of samples used for test", :type => :string
+opt :test_result_file, "file containing the resulting lines detected for each test sample", :type => :string
+opt :target_result_file, "file containing the target line delimitations for all samples", :type => :string
+end
+
+Trollop::die :test_list_file, "Test list file was not defined" unless opts[:test_list_file]
+Trollop::die :test_list_file, "Indicated test list file does not exist" unless File.exist?(opts[:test_list_file])
+
+Trollop::die :test_result_file, "Test result file was not defined" unless opts[:test_result_file]
+Trollop::die :test_result_file, "Indicated test result file does not exist" unless File.exist?(opts[:test_result_file])
+
+Trollop::die :target_result_file, "Target result file path was not defined" unless opts[:target_result_file]
+Trollop::die :target_result_file, "Indicated target result file does not exist" unless File.exist?(opts[:target_result_file])
+
+
 
