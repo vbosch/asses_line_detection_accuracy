@@ -32,3 +32,4 @@ Trollop::die :target_result_file, "Indicated target result file does not exist" 
 
 
 
+filter_list=AssesLineDetectionAccuracy::SampleList.new(opts[:test_list_file])
