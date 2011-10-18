@@ -4,7 +4,7 @@ require File.expand_path(
     File.join(File.dirname(__FILE__), %w[.. lib asses_line_detection_accuracy]))
 
 require 'trollop'
-require 'ap'
+require 'fileutils'
 
 opts = Trollop::options do
 	version "asses_line_dectection_accuracy 0.0.1 (c) 2011 Vicente Bosch Campos"
@@ -33,3 +33,43 @@ Trollop::die :target_result_file, "Indicated target result file does not exist" 
 
 
 filter_list=AssesLineDetectionAccuracy::SampleList.new(opts[:test_list_file])
+
+test_result=AssesLineDetectionAccuracy::MultiSampleDefenitionList.new(opts[:test_result_file],filter_list)
+
+test_result.set_line_reader do |line|
+  tmp = line.split
+  {:start => tmp[0].to_i/100000, :end => tmp[1].to_i/100000, :tag => tmp[2]}
+end
+
+test_result.set_tag_filter do |formatted_line|
+  tmp = false
+  tmp = true if formatted_line[:tag] == "BS"
+  tmp = true if formatted_line[:tag] == "IL"
+  tmp
+end
+
+test_result.read
+
+filter_list.reset_processed
+
+train_target=AssesLineDetectionAccuracy::MultiSampleDefenitionList.new(opts[:target_result_file],filter_list)
+
+train_target.set_line_reader do |line|
+  tmp = line.split
+  {:start => tmp[0].to_i, :end => tmp[1].to_i, :tag => tmp[2]}
+end
+
+train_target.set_tag_filter do |formatted_line|
+  tmp = false
+  tmp = true if formatted_line[:tag] == "BS"
+  tmp = true if formatted_line[:tag] == "IL"
+  tmp
+end
+
+test_result.read
+
+filter_list.each do |sample_name|
+  test_result[sample_name].write("test.txt")
+  train_target[sample_name].write("target.txt")
+  FileUtils.rm_r Dir.glob("./*.txt")
+end

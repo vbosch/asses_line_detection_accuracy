@@ -8,13 +8,16 @@ module AssesLineDetectionAccuracy
       read
     end
 
+    def each
+      @list.each{|sample_name| yield(sample_name)}
+    end
+
     def read
       File.open(@file_name,"r") do |file|
         while(line=file.gets)
           process_line(line)
         end
       end
-      ap @list
     end
 
     def process_line(line)
