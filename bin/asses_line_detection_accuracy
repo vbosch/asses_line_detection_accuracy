@@ -36,6 +36,8 @@ filter_list=AssesLineDetectionAccuracy::SampleList.new(opts[:test_list_file])
 
 test_result=AssesLineDetectionAccuracy::MultiSampleDefenitionList.new(opts[:test_result_file],filter_list)
 
+
+
 test_result.set_line_reader do |line|
   tmp = line.split
   {:start => tmp[0].to_i/100000, :end => tmp[1].to_i/100000, :tag => tmp[2]}
@@ -66,10 +68,25 @@ train_target.set_tag_filter do |formatted_line|
   tmp
 end
 
-test_result.read
+train_target.read
 
+command = "/Users/vbosch/normalized_edit_distance/bin/text_line_normalized_edit_distance"
+count = 0.0
+accum = 0.0
+results = Array.new
 filter_list.each do |sample_name|
+  count +=1.0
+  puts "Reviewing sample: #{sample_name}"
   test_result[sample_name].write("test.txt")
   train_target[sample_name].write("target.txt")
+  res = `#{command} -x test.txt -y target.txt`
+  results.push(res.to_f)
+  accum +=results.last
   FileUtils.rm_r Dir.glob("./*.txt")
 end
+
+mean = accum / count
+sum_of_squares = results.inject(0.0){|res,val| res+= (val-mean)**2}
+std_dev = Math.sqrt(sum_of_squares / count)
+
+puts "#Mean: #{mean} #Standard Deviation: #{std_dev}"
