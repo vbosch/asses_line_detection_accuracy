@@ -82,6 +82,7 @@ filter_list.each do |sample_name|
   res = `#{command} -x test.txt -y target.txt`
   results.push(res.to_f)
   accum +=results.last
+  FileUtils.mv "output.txt","#{sample_name}.ops"
   FileUtils.rm_r Dir.glob("./*.txt")
 end
 
