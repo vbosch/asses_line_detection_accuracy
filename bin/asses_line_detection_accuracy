@@ -70,7 +70,7 @@ end
 
 train_target.read
 
-command = "/Users/vbosch/normalized_edit_distance/bin/text_line_normalized_edit_distance"
+command = "/Users/vbosch/Documents/UPV/Thesis/normalized_edit_distance/bin/text_line_normalized_edit_distance"
 count = 0.0
 accum = 0.0
 operations={:insertion => 0, :deletion=> 0 , :substitution =>0}

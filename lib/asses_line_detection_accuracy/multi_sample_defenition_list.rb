@@ -62,7 +62,7 @@ module AssesLineDetectionAccuracy
     end
 
     def is_test_header_line?(line)
-      line =~ %r{(\*|\w+)/\w+.\w+$}
+      line =~ %r{(\*|\w+)/\w+.\w+}
     end
 
     def is_end_of_test_line?(line)
@@ -70,9 +70,8 @@ module AssesLineDetectionAccuracy
     end
 
     def extract_test_name(line)
-      temp = line.match(/\/\w+.w+$/).to_s
-      temp.split(".")[0]
-      #temp[1...(temp.size-1)]
+      temp = line.match(/\/\w+[.]+/).to_s
+      temp[1...(temp.size-1)]
     end
 
     def is_in_filter_list?(sample_name)
