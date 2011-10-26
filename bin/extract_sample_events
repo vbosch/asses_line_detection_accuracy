@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(
+    File.join(File.dirname(__FILE__), %w[.. lib asses_line_detection_accuracy]))
+
+require 'trollop'
+require 'fileutils'
+
+opts = Trollop::options do
+	version "extract_sample_events 0.0.1 (c) 2011 Vicente Bosch Campos"
+	banner <<-EOS
+extract_sample_events is a command tool used to extract the number of events from a .mlf file.
+Usage:
+	asses_line_dectection_accuracy [options]
+	where [options] are:
+EOS
+
+opt :filter_file, "file containing the list of samples of wich to extract information", :type => :string
+opt :mlf_input_file, "file containing the event sample information", :type => :string
+opt :output_file, "file containing the output events information", :type => :string, :default => "events.txt"
+opt :events_filter, "List of events to not consider from samples", :type => :strings, :default => ["IL","BS"]
+end
+
+Trollop::die :filter_file, "Filter file was not defined" unless opts[:filter_file]
+Trollop::die :filter_file, "Indicated filter file does not exist" unless File.exist?(opts[:filter_file])
+
+Trollop::die :mlf_input_file, "Input mlf file was not defined" unless opts[:mlf_input_file]
+Trollop::die :mlf_input_file, "Indicated mlf file does not exist" unless File.exist?(opts[:mlf_input_file])
+
+filter_list=AssesLineDetectionAccuracy::SampleList.new(opts[:filter_file])
+
+sample_list=AssesLineDetectionAccuracy::MultiSampleDefenitionList.new(opts[:mlf_input_file],filter_list)
+
+sample_list.set_line_reader do |line|
+  tmp = line.split
+  {:start => tmp[0].to_i, :end => tmp[1].to_i, :tag => tmp[2]}
+end
+
+sample_list.set_tag_filter do |formatted_line|
+  temp = false
+  temp = true if opts[:events_filter].include?(formatted_line[:tag])
+  temp
+end
+
+sample_list.read
+
+sample_list.write_sample_event_description(opts[:output_file])

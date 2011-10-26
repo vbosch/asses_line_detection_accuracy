@@ -17,6 +17,14 @@ module AssesLineDetectionAccuracy
       @line_reader = block
     end
 
+    def write_sample_event_description(file_name)
+      File.open(file_name,"w") do |file|
+        @samples.each_value do |sample|
+          file.puts sample.to_s
+        end
+      end
+    end
+
     def read
       File.open(@file_name,"r") do |file|
         while(line=file.gets)

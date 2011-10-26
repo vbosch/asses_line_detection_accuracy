@@ -33,6 +33,10 @@ module AssesLineDetectionAccuracy
       end
     end
 
+    def to_s
+      "#{@name} #{@lines.count}"
+    end
+
 
   end
 end
