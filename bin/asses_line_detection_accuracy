@@ -73,6 +73,7 @@ train_target.read
 command = "/Users/vbosch/Documents/UPV/Thesis/normalized_edit_distance/bin/text_line_normalized_edit_distance"
 count = 0.0
 accum = 0.0
+accum_2 = 0.0
 operations={:insertion => 0, :deletion=> 0 , :substitution =>0}
 results = Array.new
 filter_list.each do |sample_name|
@@ -84,18 +85,17 @@ filter_list.each do |sample_name|
   puts "#{sample_name} --> "+res
 
   vals = res.split
-  results.push(vals[4].to_f)
   operations[:substitution]+=vals[6].to_i
   operations[:insertion]+=vals[8].to_i
   operations[:deletion]+=vals[10].to_i
-  accum +=results.last
+  accum +=vals[4].to_f
+  accum_2 += vals[4].to_f**2
 
   FileUtils.mv "output.txt","#{sample_name}.ops"
   FileUtils.rm_r Dir.glob("./*.txt")
 end
 
 mean = accum / count
-sum_of_squares = results.inject(0.0){|res,val| res+= (val-mean)**2}
-std_dev = Math.sqrt(sum_of_squares / count)
+std_dev = Math.sqrt((accum_2/count) - (mean**2))
 
 puts "#Mean: #{mean} #Standard Deviation: #{std_dev} (S:#{operations[:substitution]} I:#{operations[:insertion]} D:#{operations[:deletion]})"
