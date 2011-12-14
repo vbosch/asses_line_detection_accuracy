@@ -19,6 +19,14 @@ module AssesLineDetectionAccuracy
       @lines.push(tmp) unless @tag_filter.call(tmp)
     end
 
+    def base_line_extract
+    	line = ""
+        @lines.each_with_index do |val,index|
+          line += "#{val[:end]}\n"
+        end
+        return line
+    end
+
     def write(file_name)
       File.open(file_name,"w") do |file|
         file.puts "# File: #{@name}"

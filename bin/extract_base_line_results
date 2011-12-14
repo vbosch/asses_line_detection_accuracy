@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(
+    File.join(File.dirname(__FILE__), %w[.. lib asses_line_detection_accuracy]))
+
+require 'trollop'
+require 'fileutils'
+
+opts = Trollop::options do
+	version "asses_line_dectection_accuracy 0.0.1 (c) 2011 Vicente Bosch Campos"
+	banner <<-EOS
+asses_line_dectection_accuracy is a command tool to review the accuracy of the detected lines against the orinal line
+label file by means of the edit distance.
+Usage:
+	asses_line_dectection_accuracy [options]
+	where [options] are:
+EOS
+
+opt :test_list_file, "file containing the list of samples used for test", :type => :string
+opt :test_result_file, "file containing the resulting lines detected for each test sample", :type => :string
+end
+
+Trollop::die :test_list_file, "Test list file was not defined" unless opts[:test_list_file]
+Trollop::die :test_list_file, "Indicated test list file does not exist" unless File.exist?(opts[:test_list_file])
+
+Trollop::die :test_result_file, "Test result file was not defined" unless opts[:test_result_file]
+Trollop::die :test_result_file, "Indicated test result file does not exist" unless File.exist?(opts[:test_result_file])
+
+
+
+filter_list=AssesLineDetectionAccuracy::SampleList.new(opts[:test_list_file])
+
+test_result=AssesLineDetectionAccuracy::MultiSampleDefenitionList.new(opts[:test_result_file],filter_list)
+
+
+
+test_result.set_line_reader do |line|
+  tmp = line.split
+  {:start => tmp[0].to_i/100000, :end => tmp[1].to_i/100000, :tag => tmp[2]}
+end
+
+test_result.set_tag_filter do |formatted_line|
+  tmp = false
+  tmp = true if formatted_line[:tag] == "BS"
+  tmp = true if formatted_line[:tag] == "IL"
+  tmp
+end
+
+test_result.read
+
+filter_list.each do |sample_name|
+
+	File.open("#{sample_name}.bl","w") do |file|
+  		file.puts test_result[sample_name].base_line_extract
+	end
+
+
+end
+
