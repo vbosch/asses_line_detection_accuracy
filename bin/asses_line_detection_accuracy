@@ -109,6 +109,6 @@ end
 
 mean = cost_accum / length_accum
 
-std_dev = Math.sqrt((accum_2/count_accum) - (mean**2))
+std_dev = Math.sqrt(((accum_2/count_accum) - (mean**2)).abs)
 
 puts "Total: mean: #{mean.to_s.ljust(20)} std_dev: #{std_dev.to_s.ljust(20)} (S: #{operations[:substitution]} I: #{operations[:insertion]} D: #{operations[:deletion]})"
